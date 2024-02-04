@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "football-analysis"
+version = "0.1.0"
+description = ""
+authors = ["kirill-push <kirillpush@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+opencv-python = "^4.9.0.80"
+
+
+[tool.poetry.group.lint.dependencies]
+isort = "^5.13.2"
+black = "^24.1.1"
+mypy = "^1.8.0"
+flake8 = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
