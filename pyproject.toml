@@ -54,4 +54,6 @@ warn_unreachable = true
 pretty = true
 exclude = [
     'resources',
+    '.mypy_cache',
+    'football_analysis/__pycache__',
 ]
