@@ -105,42 +105,66 @@ class VideoFrameData:
         frame_idx: int,
         box_type: str | None = None,
         bboxes_list: List | None = None,
+        draw_team: bool = False,
     ) -> None:
-        frame_data = self.get_item(frame_idx)
-        if frame_data is None:
-            print("Frame index out of bounds.")
-            return
+        if not draw_team:
+            frame_data = self.get_item(frame_idx)
+            if frame_data is None:
+                print("Frame index out of bounds.")
+                return
 
-        frame = frame_data["frame"].copy()
-        plt.figure(figsize=(30, 3))
-        if bboxes_list is None:
-            for key, bboxes in frame_data["bboxes"].items():
-                for bbox in bboxes:
-                    if box_type is None or key == box_type:
-                        x1, y1, x2, y2, _ = bbox
-                        cv2.rectangle(
-                            frame,
-                            (int(x1), int(y1)),
-                            (int(x2), int(y2)),
-                            self.get_color_by_type(key),
-                            2,
-                        )
+            frame = frame_data["frame"].copy()
+            plt.figure(figsize=(30, 3))
+            if bboxes_list is None:
+                for key, bboxes in frame_data["bboxes"].items():
+                    for bbox in bboxes:
+                        if box_type is None or key == box_type:
+                            x1, y1, x2, y2, _ = bbox
+                            cv2.rectangle(
+                                frame,
+                                (int(x1), int(y1)),
+                                (int(x2), int(y2)),
+                                self.get_color_by_type(key),
+                                2,
+                            )
+            else:
+                if box_type is None:
+                    box_type = "pl"
+                for bbox in bboxes_list:
+                    x1, y1, x2, y2, _ = bbox
+                    cv2.rectangle(
+                        frame,
+                        (int(x1), int(y1)),
+                        (int(x2), int(y2)),
+                        self.get_color_by_type(box_type),
+                        2,
+                    )
+
+            # plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            # plt.axis("off")
+            # plt.show()
+            return frame
+
         else:
-            if box_type is None:
-                box_type = "pl"
-            for bbox in bboxes_list:
-                x1, y1, x2, y2, _ = bbox
-                cv2.rectangle(
-                    frame,
-                    (int(x1), int(y1)),
-                    (int(x2), int(y2)),
-                    self.get_color_by_type(box_type),
-                    2,
-                )
+            frame = self.frames[frame_idx].copy()
+            for bbox_stats in self.bboxes_stats[frame_idx].values():
+                if bbox_stats["class"] in [0, 1]:  # Draw only valid team members
+                    bbox = bbox_stats["bbox"]
+                    color = self.team_colors[bbox_stats["class"]]
+                    x1, y1, x2, y2 = [int(coord) for coord in bbox[:4]]
+                    team_label = f"Team {bbox_stats['class']}"
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+                    cv2.putText(
+                        frame,
+                        team_label,
+                        (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        color,
+                        2,
+                    )
 
-        plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        plt.axis("off")
-        plt.show()
+            return frame
 
     @staticmethod
     def get_color_by_type(object_type: str) -> Tuple[int, int, int]:
