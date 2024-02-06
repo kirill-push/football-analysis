@@ -94,9 +94,10 @@ class VideoFrameData:
         if frame_idx < 0 or frame_idx >= len(self.frames):
             return None
         frame_data: Dict[str, np.ndarray | Dict] = {"frame": self.frames[frame_idx]}
+        frame_data["bboxes"] = {}
         for key, bboxes_list in self.bboxes.items():
             if frame_idx < len(bboxes_list):
-                frame_data["bboxes"] = {key: bboxes_list[frame_idx]}
+                frame_data["bboxes"][key] = bboxes_list[frame_idx]
         return frame_data
 
     def visualize_frame(
