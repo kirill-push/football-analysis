@@ -32,6 +32,32 @@ class VideoFrameData:
         for key, path in self.bbox_paths.items():
             with open(path, "r") as f:
                 self.bboxes[key] = json.load(f)
+
+    def preprocess_bboxes(
+        self,
+        min_width: float,
+        max_proportion: float,
+        min_proportion: float,
+        min_area: float,
+    ) -> None:
+        self._calculate_bboxes_stats("pl")
+        for frame_idx, frame_bboxes in self.bboxes_stats.items():
+            for bbox_idx, bbox_stats in frame_bboxes.items():
+                width = bbox_stats["width"]
+                proportion = bbox_stats["proportion"]
+                area = bbox_stats["area"]
+
+                # Check if bbox has bad params
+                if (
+                    width < min_width
+                    or proportion > max_proportion
+                    or proportion < min_proportion
+                    or area < min_area
+                ):
+                    self.bboxes_stats[frame_idx][bbox_idx]["class"] = None
+                else:
+                    self.bboxes_stats[frame_idx][bbox_idx]["class"] = -1
+
     def get_item(self, frame_idx: int) -> Dict[str, Any] | None:
         if frame_idx < 0 or frame_idx >= len(self.frames):
             return None
