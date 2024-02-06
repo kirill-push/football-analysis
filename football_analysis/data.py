@@ -186,6 +186,22 @@ class VideoFrameData:
 
         self.team_colors = np.vstack((team_0_color, team_1_color))
 
+    def match_bbox_to_color(self) -> None:
+        for i, frame_stat in self.bboxes_stats.items():
+            for j, bbox_stat in frame_stat.items():
+                if bbox_stat["class"] is not None:
+                    average_color = get_average_color(self.frames[i], bbox_stat["bbox"])
+                    if self.color_distance(
+                        average_color, self.team_colors[0]
+                    ) < self.color_distance(average_color, self.team_colors[1]):
+                        self.bboxes_stats[i][j]["class"] = 0
+                    else:
+                        self.bboxes_stats[i][j]["class"] = 1
+
+    def color_distance(self, x: np.ndarray, y: np.ndarray) -> float:
+        weight = np.array([0.11, 0.59, 0.3])
+        return np.sqrt(np.sum(weight * (x - y) * (x - y)))
+
     def visualize_frame(
         self,
         frame_idx: int,
