@@ -4,6 +4,9 @@ from typing import Any, Dict, List, Tuple
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.cluster import DBSCAN
+
+from football_analysis.utils import get_average_color
 
 
 class VideoFrameData:
@@ -151,6 +154,37 @@ class VideoFrameData:
             if frame_idx < len(bboxes_list):
                 frame_data["bboxes"][key] = bboxes_list[frame_idx]
         return frame_data
+
+    def find_colors(self, eps: float = 10, min_samples: int | None = None) -> None:
+        average_colors = []
+        for i, frame_stat in self.bboxes_stats.items():
+            average_colors.extend(
+                [
+                    get_average_color(self.frames[i], bbox_stat["bbox"])
+                    for bbox_stat in frame_stat.values()
+                    if bbox_stat["class"] is not None
+                ]
+            )
+        # Perform DBSCAN clustering
+        if min_samples is None:
+            min_samples = len(self.frames)
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples).fit(average_colors)
+
+        labels_dbscan = dbscan.labels_
+        if len(labels_dbscan) != 3:
+            print(
+                f"Try to use other params for DBSCAN, it was found {len(labels_dbscan) - 1} clusters"
+            )
+        team_0_labels = np.where(labels_dbscan == 0)[0]
+        team_1_labels = np.where(labels_dbscan == 1)[0]
+
+        team_0_colors = np.array(average_colors)[team_0_labels]
+        team_1_colors = np.array(average_colors)[team_1_labels]
+
+        team_0_color = np.mean(team_0_colors, 0)
+        team_1_color = np.mean(team_1_colors, 0)
+
+        self.team_colors = np.vstack((team_0_color, team_1_color))
 
     def visualize_frame(
         self,
