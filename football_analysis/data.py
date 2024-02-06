@@ -93,8 +93,13 @@ class VideoFrameData:
                     "confidence": bbox[-1],
                 }
 
-    def assign_teams_to_bboxes(self, del_bg: bool = True) -> None:
-        pass
+    def assign_teams_to_bboxes(self, eps: float, min_samples: int | None) -> None:
+        self.find_colors(
+            eps=eps,
+            min_samples=min_samples,
+        )
+        self.match_bbox_to_color()
+
 
     def get_item(self, frame_idx: int) -> Dict[str, Any] | None:
         if frame_idx < 0 or frame_idx >= len(self.frames):
