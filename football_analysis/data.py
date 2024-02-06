@@ -58,6 +58,37 @@ class VideoFrameData:
                 else:
                     self.bboxes_stats[frame_idx][bbox_idx]["class"] = -1
 
+    def calculate_bboxes_stats(self, bbox_type: str = "pl") -> None:
+        bboxes = self.bboxes[bbox_type]
+        self.bboxes_stats: Dict[int, Dict[int, Dict[str, Any]]] = {}
+        self.bboxes_areas: List[float] = []
+        self.bboxes_proportions: List[float] = []
+        self.bboxes_ids = []
+        self.bboxes_conf = []
+
+        for i, frame_boxes in enumerate(bboxes):
+            self.bboxes_stats[i] = dict()
+            for j, bbox in enumerate(frame_boxes):
+                self.bboxes_ids.append((i, j))
+                self.bboxes_conf.append(bbox[-1])
+                # Calculate area: (x2 - x1) * (y2 - y1)
+                height = bbox[3] - bbox[1]
+                width = bbox[2] - bbox[0]
+                area = width * height
+                self.bboxes_areas.append(area)
+
+                proportion = height / width
+                self.bboxes_proportions.append(proportion)
+
+                self.bboxes_stats[i][j] = {
+                    "height": height,
+                    "width": width,
+                    "area": area,
+                    "proportion": proportion,
+                    "bbox": bbox,
+                    "confidence": bbox[-1],
+                }
+
     def get_item(self, frame_idx: int) -> Dict[str, Any] | None:
         if frame_idx < 0 or frame_idx >= len(self.frames):
             return None
