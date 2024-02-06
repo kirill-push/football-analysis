@@ -16,6 +16,7 @@ class VideoFrameData:
         }
         self.load_video_frames()
         self.load_bboxes()
+        self.n_frames = len(self.frames)
 
     def load_video_frames(self) -> None:
         cap: cv2.VideoCapture = cv2.VideoCapture(self.video_path)
