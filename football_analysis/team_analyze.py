@@ -12,7 +12,7 @@ def remove_background_and_get_avg_color(
         color of the player.
 
     Args:
-        image (np.ndarray): The input image.
+        image (np.ndarray): The input image in BGR.
         box (List): A list containing the coordinates of the bounding box in format:
             (x1, y1, x2, y2, _).
         head (float): The percentage of the player's head to retain.
@@ -29,12 +29,11 @@ def remove_background_and_get_avg_color(
     crop_img = crop_image(image, box, head, legs)
 
     # Convert the image to HSV
-    hsv_crop_img = cv2.cvtColor(crop_img, cv2.COLOR_RGB2HSV)
+    hsv_crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
 
     # Define the range for green color
-    # TODO: These values may need adjustment
-    lower_green = np.array([35, 25, 25])
-    upper_green = np.array([85, 255, 255])
+    lower_green = np.array([40, 40, 40])
+    upper_green = np.array([70, 255, 255])
 
     # Create a mask for green color
     mask = cv2.inRange(hsv_crop_img, lower_green, upper_green)
