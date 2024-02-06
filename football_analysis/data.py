@@ -94,56 +94,7 @@ class VideoFrameData:
                 }
 
     def assign_teams_to_bboxes(self, del_bg: bool = True) -> None:
-        """
-        Assigns bboxes to two teams across all frames, ensuring consistency in team colors.
-        """
-        self.color_history = []
-        for frame_idx, frame in enumerate(self.frames):
-            # Filter bboxes for this frame with class -1 (valid bboxes)
-            valid_bboxes = [
-                self.bboxes_stats[frame_idx][bbox_idx]["bbox"]
-                for bbox_idx in self.bboxes_stats[frame_idx]
-                if self.bboxes_stats[frame_idx][bbox_idx]["class"] is not None
-            ]
-
-            # If there are valid bboxes to process
-            if valid_bboxes:
-                team_1, team_2, team_colors = find_teams(
-                    frame, valid_bboxes, del_bg=del_bg
-                )
-                if frame_idx > 0:
-                    team_1, team_2, team_colors, last_colors = (
-                        self.compare_color_with_previous(
-                            team_1, team_2, team_colors, last_colors
-                        )
-                    )
-                    self.team_colors = (self.team_colors * frame_idx + team_colors) / (
-                        frame_idx + 1
-                    )
-                else:
-                    last_colors = team_colors.copy()
-                    self.team_colors = team_colors.copy()
-                self.color_history.append(team_colors)
-                # Update bbox classes based on team assignment
-                for bbox_idx, bbox_stats in self.bboxes_stats[frame_idx].items():
-                    if (
-                        bbox_stats["class"] == -1
-                    ):  # Process only previously valid bboxes
-                        bbox = bbox_stats["bbox"]
-                        if bbox in team_1:
-                            self.bboxes_stats[frame_idx][bbox_idx]["class"] = 0
-                        elif bbox in team_2:
-                            self.bboxes_stats[frame_idx][bbox_idx]["class"] = 1
-
-    def compare_color_with_previous(self, team_1, team_2, team_colors, last_colors):
-        if np.linalg.norm(team_colors[0] - last_colors[1]) + np.linalg.norm(
-            team_colors[1] - last_colors[0]
-        ) < np.linalg.norm(team_colors[0] - last_colors[0]) + np.linalg.norm(
-            team_colors[1] - last_colors[1]
-        ):
-            # Если цвета команд лучше соответствуют в инверсии, меняем местами
-            return team_2, team_1, team_colors[::-1], team_colors[::-1]
-        return team_1, team_2, team_colors, team_colors
+        pass
 
     def get_item(self, frame_idx: int) -> Dict[str, Any] | None:
         if frame_idx < 0 or frame_idx >= len(self.frames):
