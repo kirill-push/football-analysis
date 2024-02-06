@@ -202,6 +202,41 @@ class VideoFrameData:
         weight = np.array([0.11, 0.59, 0.3])
         return np.sqrt(np.sum(weight * (x - y) * (x - y)))
 
+    def create_video_with_bboxes(
+        self, output_path: str, fps: int = 30, slow_factor: float = 1.0
+    ) -> None:
+        """
+        Creates a video with bounding boxes and team labels drawn on each frame.
+
+        Args:
+        output_path (str): Path where the output video will be saved.
+        fps (int): Frames per second for the output video.
+        slow_factor (float): Factor to slow down the video. 1.0 is the original speed,
+                             2.0 would be half speed, etc.
+        """
+        if not self.frames:
+            print("No frames to process.")
+            return
+
+        # Adjust fps according to the slow_factor
+        adjusted_fps = fps // slow_factor
+
+        # Assume the first frame is representative for all (in terms of dimensions)
+        height, width, _ = self.frames[0].shape
+
+        # Initialize VideoWriter
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # or 'XVID', 'MP4V'
+        out = cv2.VideoWriter(output_path, fourcc, adjusted_fps, (width, height))
+
+        for frame_idx in range(len(self.frames)):
+            annotated_frame = self.visualize_frame(
+                frame_idx, box_type="pl", bboxes_list=None, draw_team=True
+            )
+            out.write(annotated_frame)
+
+        out.release()
+        print(f"Video saved to {output_path}")
+
     def visualize_frame(
         self,
         frame_idx: int,
