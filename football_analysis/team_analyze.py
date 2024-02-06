@@ -49,12 +49,10 @@ if __name__ == "__main__":
         min_area=500.0,
     )
 
-    video_data.find_colors(
+    video_data.assign_teams_to_bboxes(
         eps=10.0,
         min_samples=len(video_data.frames),
     )
-
-    video_data.match_bbox_to_color()
 
     team_colors = {
         "Team 0 in RGB": video_data.team_colors[0][::-1],
