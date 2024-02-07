@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-s",
         "--slow_factor",
-        default=0.5,
+        default=0.75,
         help="Slow factor for result video",
     )
     parser.add_argument(

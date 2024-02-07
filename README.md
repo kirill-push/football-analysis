@@ -78,7 +78,7 @@ With Poetry installed, you can now install the project's dependencies.
    Default is `"resources/PTZ_panorama_23sec.mp4"`
    - `-c` or `--color_path`: Path to JSON to save team colors. Default is `"team_colors.json"`.
    - `-o` or `--output_path`: Path to save video with boxes. Default is `"result_video.mp4"`.
-   - `-s` or `--slow_factor`: Slow factor for result video. Default is `0.5`.
+   - `-s` or `--slow_factor`: Slow factor for result video. Default is `0.75`.
    - `-r` or `--path_to_resources`: Path to the resources directory. Default is `"resources"`.
 
    To run the script, use a command in the following format:
