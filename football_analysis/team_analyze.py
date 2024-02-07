@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 
 from football_analysis.data import VideoFrameData
 
@@ -9,35 +10,42 @@ if __name__ == "__main__":
         "-v",
         "--video_path",
         default="resources/PTZ_panorama_23sec.mp4",
-        help="Path to videos",
+        help="Path to video with football",
     )
     parser.add_argument(
         "-c",
         "--color_path",
         default="team_colors.json",
-        help="Path to JSON with to save team colors",
+        help="Path to JSON to save team colors",
     )
     parser.add_argument(
         "-o",
         "--output_path",
         default="result_video.mp4",
-        help="Path to to save video with boxes",
+        help="Path to save video with boxes",
     )
     parser.add_argument(
         "-s",
         "--slow_factor",
-        default=2,
+        default=0.5,
         help="Slow factor for result video",
+    )
+    parser.add_argument(
+        "-r",
+        "--path_to_resources",
+        default="resources",
+        help="Path to the resources directory",
     )
 
     # Collect arguments
     args = parser.parse_args()
 
+    resources = args.path_to_resources
     bbox_paths = {
-        "ball": "resources/ball_bboxes.json",
-        "gkeep": "resources/gkeep_bboxes.json",
-        "pl": "resources/pl_bboxes.json",
-        "ref": "resources/ref_bboxes.json",
+        "ball": os.path.join(resources, "ball_bboxes.json"),
+        "gkeep": os.path.join(resources, "gkeep_bboxes.json"),
+        "pl": os.path.join(resources, "pl_bboxes.json"),
+        "ref": os.path.join(resources, "ref_bboxes.json"),
     }
 
     video_data = VideoFrameData(args.video_path, bbox_paths)
