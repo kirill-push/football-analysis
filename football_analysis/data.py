@@ -95,6 +95,7 @@ class VideoFrameData:
                     "proportion": proportion,
                     "bbox": bbox,
                     "confidence": bbox[-1],
+                    "class": -1,
                 }
 
     def assign_teams_to_bboxes(self, eps: float, min_samples: int | None) -> None:
@@ -103,7 +104,6 @@ class VideoFrameData:
             min_samples=min_samples,
         )
         self.match_bbox_to_color()
-
 
     def get_item(self, frame_idx: int) -> Dict[str, Any] | None:
         if frame_idx < 0 or frame_idx >= len(self.frames):
@@ -115,7 +115,7 @@ class VideoFrameData:
                 frame_data["bboxes"][key] = bboxes_list[frame_idx]
         return frame_data
 
-    def find_colors(self, eps: float = 10, min_samples: int | None = None) -> None:
+    def find_colors(self, eps: float = 10.0, min_samples: int | None = None) -> None:
         average_colors = []
         for i, frame_stat in self.bboxes_stats.items():
             average_colors.extend(
@@ -131,9 +131,9 @@ class VideoFrameData:
         dbscan = DBSCAN(eps=eps, min_samples=min_samples).fit(average_colors)
 
         labels_dbscan = dbscan.labels_
-        if len(labels_dbscan) != 3:
+        if len(np.unique(labels_dbscan)) != 3:
             print(
-                f"Try to use other params for DBSCAN, it was found {len(labels_dbscan) - 1} clusters"
+                f"Try to use other params for DBSCAN, it was found {len(np.unique(labels_dbscan)) - 1} clusters"
             )
         team_0_labels = np.where(labels_dbscan == 0)[0]
         team_1_labels = np.where(labels_dbscan == 1)[0]
