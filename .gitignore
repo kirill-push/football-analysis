@@ -1,4 +1,5 @@
-/resources
+!resources
+/resources/*
 /notebooks
 .python-version
 .mypy_cache
