@@ -3,3 +3,5 @@
 .python-version
 .mypy_cache
 __pycache__
+result_video.mp4
+team_colors.json
