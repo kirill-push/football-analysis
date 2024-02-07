@@ -46,8 +46,8 @@ if __name__ == "__main__":
         max_proportion=5.0,
         min_proportion=0.9,
         min_area=500.0,
-        x_left=[0, 1700],
-        y_left=[330, 0],
+        x_left=(0, 1700),
+        y_left=(330, 0),
     )
     print("Start to devide players by team")
     video_data.assign_teams_to_bboxes(

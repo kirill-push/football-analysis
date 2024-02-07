@@ -132,9 +132,8 @@ class VideoFrameData:
 
         labels_dbscan = dbscan.labels_
         if len(np.unique(labels_dbscan)) != 3:
-            print(
-                f"Try to use other params for DBSCAN, it was found {len(np.unique(labels_dbscan)) - 1} clusters"
-            )
+            print(f"It was found {len(np.unique(labels_dbscan)) - 1} clusters")
+            raise ValueError("Try to use other params for DBSCAN")
         team_0_labels = np.where(labels_dbscan == 0)[0]
         team_1_labels = np.where(labels_dbscan == 1)[0]
 
@@ -171,21 +170,22 @@ class VideoFrameData:
         Args:
         output_path (str): Path where the output video will be saved.
         fps (int): Frames per second for the output video.
+            Defaults to 30.
         slow_factor (float): Factor to slow down the video. 1.0 is the original speed,
-                             2.0 would be half speed, etc.
+            0.5 would be half speed, etc. Defaults to 1.0
         """
         if not self.frames:
             print("No frames to process.")
             return
 
         # Adjust fps according to the slow_factor
-        adjusted_fps = fps // slow_factor
+        adjusted_fps = fps * slow_factor
 
         # Assume the first frame is representative for all (in terms of dimensions)
         height, width, _ = self.frames[0].shape
 
         # Initialize VideoWriter
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # or 'XVID', 'MP4V'
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # type: ignore
         out = cv2.VideoWriter(output_path, fourcc, adjusted_fps, (width, height))
 
         for frame_idx in range(len(self.frames)):
@@ -203,12 +203,11 @@ class VideoFrameData:
         box_type: str | None = None,
         bboxes_list: List | None = None,
         draw_team: bool = False,
-    ) -> None:
+    ) -> np.ndarray:
         if not draw_team:
             frame_data = self.get_item(frame_idx)
             if frame_data is None:
-                print("Frame index out of bounds.")
-                return
+                raise IndexError("Frame index out of bounds.")
 
             frame = frame_data["frame"].copy()
             plt.figure(figsize=(30, 3))
