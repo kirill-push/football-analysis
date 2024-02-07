@@ -3,7 +3,6 @@ import json
 
 from football_analysis.data import VideoFrameData
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Devide teams by color")
     parser.add_argument(
@@ -43,26 +42,31 @@ if __name__ == "__main__":
 
     video_data = VideoFrameData(args.video_path, bbox_paths)
     video_data.preprocess_bboxes(
-        min_width=10.0,
+        min_width=12.0,
         max_proportion=5.0,
         min_proportion=0.9,
         min_area=500.0,
+        x_left=[0, 1700],
+        y_left=[330, 0],
     )
-
+    print("Start to devide players by team")
     video_data.assign_teams_to_bboxes(
         eps=10.0,
-        min_samples=len(video_data.frames),
+        min_samples=video_data.n_frames,
     )
-
+    print("Found team colors")
     team_colors = {
-        "Team 0 in RGB": video_data.team_colors[0][::-1],
-        "Team 1 in RGB": video_data.team_colors[1][::-1],
+        "Team 0 in RGB": [color for color in video_data.team_colors[0][::-1]],
+        "Team 1 in RGB": [color for color in video_data.team_colors[1][::-1]],
     }
     with open(args.color_path, "w") as file:
         json.dump(team_colors, file)
+    print(f"Colors saved to {args.color_path}")
 
+    print("Start to create video with team bboxes")
     video_data.create_video_with_bboxes(
-        output_path=args.output_pat,
+        output_path=args.output_path,
         fps=30,
         slow_factor=args.slow_factor,
     )
+    print(f"Video saved to {args.output_path}")
