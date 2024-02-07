@@ -1,7 +1,14 @@
 # Brief task description
-There is a video showing two teams playing football. There are also JSON files containing boundin boxes with players, referees, balls and goalkeepers. For each relevant box, it was needed to get the team number 0 or 1, or None if the box is not relevant.
+There is a video showing two teams playing football. There are also JSON files containing bounding boxes with players, referees, balls and goalkeepers. For each relevant box, it was needed to get the team number 0 or 1, or None if the box is not relevant.
 
 Also, based on the results of the video, it was needed to get the color of each of the teams in rgb format
+
+# Brief method description
+To determine the color of the teams, I used the DBSCAN clustering method, discarding outliers and calculating the average color for each of the teams in the remaining two classes. After that, knowing the colors of the teams, for each bounding box, I compared the distance from the average color of each box to the color of the team.
+
+Previously, I filtered the boxes by their size, area, location on the field and proportions.
+
+I counted the average color of the box after cutting the estimated position of the head (top 20 %), the position of the legs (bottom 50 %), as well as the position of the arms (right and left 25% each)
 
 # Activate Poetry Environment
 
