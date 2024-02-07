@@ -43,13 +43,18 @@ class VideoFrameData:
         max_proportion: float,
         min_proportion: float,
         min_area: float,
+        x_left: Tuple[int, int],
+        y_left: Tuple[int, int],
     ) -> None:
-        self._calculate_bboxes_stats("pl")
+        self.calculate_bboxes_stats("pl")
         for frame_idx, frame_bboxes in self.bboxes_stats.items():
             for bbox_idx, bbox_stats in frame_bboxes.items():
                 width = bbox_stats["width"]
                 proportion = bbox_stats["proportion"]
                 area = bbox_stats["area"]
+                x_b, y_b = bbox_stats["bbox"][:2]
+                x1, x2 = x_left
+                y1, y2 = y_left
 
                 # Check if bbox has bad params
                 if (
@@ -57,10 +62,9 @@ class VideoFrameData:
                     or proportion > max_proportion
                     or proportion < min_proportion
                     or area < min_area
+                    or y_b - y1 < (y2 - y1) * (x_b - x1) / (x2 - x1)
                 ):
                     self.bboxes_stats[frame_idx][bbox_idx]["class"] = None
-                else:
-                    self.bboxes_stats[frame_idx][bbox_idx]["class"] = -1
 
     def calculate_bboxes_stats(self, bbox_type: str = "pl") -> None:
         bboxes = self.bboxes[bbox_type]
