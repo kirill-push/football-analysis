@@ -57,4 +57,5 @@ exclude = [
     'resources',
     '.mypy_cache',
     'football_analysis/__pycache__',
+    'notebooks',
 ]
